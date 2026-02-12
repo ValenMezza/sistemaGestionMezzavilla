@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= (typeof title !== 'undefined' && title) ? title : (mode === 'create' ? 'Nuevo cliente' : 'Editar cliente') %></title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="nav">
+    <div class="nav__inner">
+      <a class="brand" href="/home">
+        <span class="brand__dot"></span>
+        <span>Sistemas Mezzavilla</span>
+      </a>
+
+      <% if (user) { %>
+        <div class="nav__links">
+          <a class="btn btn--ghost" href="/cantera">Cantera</a>
+          <a class="btn btn--ghost" href="/viajes">Viajes</a>
+          <a class="btn btn--ghost" href="/stock">Stock</a>
+          <a class="btn btn--ghost" href="/clientes">Clientes</a>
+        </div>
+
+        <div class="nav__right">
+          <span class="small">👤 <%= user.username %></span>
+          <form method="POST" action="/logout">
+            <button class="btn btn--danger" type="submit">Salir</button>
+          </form>
+        </div>
+      <% } else { %>
+        <div class="nav__right" style="margin-left:auto;">
+          <a class="btn btn--primary" href="/login">Ingresar</a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row row--space">
+      <h1><%= mode === 'create' ? 'Nuevo cliente' : 'Editar cliente' %></h1>
+      <a class="btn btn--ghost" href="/clientes">Volver</a>
+    </div>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <form class="card" method="POST" action="<%= mode === 'create' ? '/clientes/nuevo' : ('/clientes/' + client.id + '/editar') %>">
+      <div class="field">
+        <label>Nombre completo</label>
+        <input name="full_name" value="<%= (client && client.full_name) ? client.full_name : '' %>" required />
+      </div>
+
+      <div class="field">
+        <label>Teléfono</label>
+        <input name="phone" value="<%= (client && client.phone) ? client.phone : '' %>" />
+      </div>
+
+      <div class="row">
+        <button class="btn btn--primary" type="submit">
+          <%= mode === 'create' ? 'Crear cliente' : 'Guardar cambios' %>
+        </button>
+        <a class="btn btn--ghost" href="/clientes">Cancelar</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="footer">
+    <div class="small">Sistema interno — versión sin DB (memoria). Listo para migrar a PostgreSQL.</div>
+  </div>
+</body>
+</html>

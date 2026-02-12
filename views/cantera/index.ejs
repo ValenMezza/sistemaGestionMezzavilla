@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head', { title: 'Cantera' }) %>
+<body>
+  <%- include('../partials/nav') %>
+
+  <div class="container">
+    <h1>Cantera</h1>
+    <p class="muted">Gestión de ventas en cantera</p>
+
+    <div class="grid">
+      <a href="/cantera/vender" class="card card--link">
+        <h2>Venta rápida</h2>
+        <p class="muted">Registrar una venta inmediata</p>
+      </a>
+
+      <a href="/cantera/semanal" class="card card--link">
+        <h2>Resúmenes semanales</h2>
+        <p class="muted">Ventas por semana y día</p>
+      </a>
+
+      <a href="/cantera/mensual" class="card card--link">
+        <h2>Resumen mensual</h2>
+        <p class="muted">Vista general del mes</p>
+      </a>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

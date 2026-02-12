@@ -1,0 +1,28 @@
+<div class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="/home">
+      <span class="brand__dot"></span>
+      <span>Sistemas Mezzavilla</span>
+    </a>
+
+    <% if (user) { %>
+      <div class="nav__links">
+        <a class="btn btn--ghost" href="/cantera">Cantera</a>
+        <a class="btn btn--ghost" href="/viajes">Viajes</a>
+        <a class="btn btn--ghost" href="/stock">Stock</a>
+        <a class="btn btn--ghost" href="/clientes">Clientes</a>
+      </div>
+
+      <div class="nav__right">
+        <span class="small">👤 <%= user.username %></span>
+        <form method="POST" action="/logout">
+          <button class="btn btn--danger" type="submit">Salir</button>
+        </form>
+      </div>
+    <% } else { %>
+      <div class="nav__right" style="margin-left:auto;">
+        <a class="btn btn--primary" href="/login">Ingresar</a>
+      </div>
+    <% } %>
+  </div>
+</div>

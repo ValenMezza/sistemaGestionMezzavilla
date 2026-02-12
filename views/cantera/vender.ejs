@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head', { title: 'Venta Cantera' }) %>
+<body>
+  <%- include('../partials/nav') %>
+
+  <div class="container">
+    <h1>Venta rápida – Cantera</h1>
+
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+
+    <form method="POST" action="/cantera/vender" class="card">
+
+      <div class="field">
+        <label>Fecha y hora</label>
+        <input type="datetime-local" name="sale_datetime" required>
+      </div>
+
+      <div class="inline">
+        <input type="checkbox" id="client_manual_enabled" name="client_manual_enabled">
+        <label for="client_manual_enabled">Cliente no existe</label>
+      </div>
+
+      <div class="field" id="client_select_block">
+        <label>Cliente</label>
+        <select name="client_id">
+          <option value="">-- Seleccionar --</option>
+          <% clients.forEach(c => { %>
+            <option value="<%= c.id %>"><%= c.full_name %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="field" id="client_manual_block" style="display:none;">
+        <label>Nombre cliente</label>
+        <input name="client_name_manual" placeholder="Nombre completo">
+      </div>
+
+      <div class="field">
+        <label>Producto</label>
+        <select name="product_id" id="product_id" required>
+          <option value="">-- Seleccionar --</option>
+          <% products.forEach(p => { %>
+            <option value="<%= p.id %>" data-price="<%= p.price %>">
+              <%= p.name %> ($<%= p.price %>)
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Precio unitario</label>
+          <input type="number" step="0.01" name="product_price" id="product_price">
+        </div>
+
+        <div class="field">
+          <label>Cantidad</label>
+          <input type="number" min="1" value="1" name="qty" id="qty" required>
+        </div>
+      </div>
+
+      <div class="card">
+        <b>Subtotal:</b> $<span id="subtotal">0.00</span>
+      
+<div class="inline" style="margin-top:10px;">
+  <input type="checkbox" id="allow_edit_final" name="allow_edit_final">
+  <label for="allow_edit_final">Modificar precio final</label>
+</div>
+
+<div class="field" id="final_price_block" style="display:none;">
+  <label>Precio final</label>
+  <input type="number" step="0.01" name="final_price" id="final_price" placeholder="0.00">
+  <small class="muted">Si está activo, este valor reemplaza el subtotal.</small>
+</div>
+
+</div>
+
+      <div class="field">
+        <label>Forma de pago</label>
+        <select name="payment_method" required>
+          <option value="efectivo">Efectivo</option>
+          <option value="transferencia">Transferencia</option>
+          <option value="vales">Vales</option>
+          <option value="fiado">Fiado</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <button class="btn btn--primary" type="submit">Guardar venta</button>
+        <a href="/cantera" class="btn btn--ghost">Cancelar</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const manual = document.getElementById('client_manual_enabled');
+    const sel = document.getElementById('client_select_block');
+    const man = document.getElementById('client_manual_block');
+
+    manual.addEventListener('change', () => {
+      sel.style.display = manual.checked ? 'none' : 'block';
+      man.style.display = manual.checked ? 'block' : 'none';
+    });
+
+    const prod = document.getElementById('product_id');
+    const price = document.getElementById('product_price');
+    const qty = document.getElementById('qty');
+    const subtotal = document.getElementById('subtotal');
+
+    function calc(){
+      const p = Number(price.value || 0);
+      const q = Number(qty.value || 1);
+      const sub = p * q;
+      subtotal.textContent = sub.toFixed(2);
+
+      // si no está editando, mantener final_price sincronizado con subtotal
+      const allow = document.getElementById('allow_edit_final');
+      const finalInput = document.getElementById('final_price');
+      if (allow && finalInput && !allow.checked) {
+        finalInput.value = sub.toFixed(2);
+      }
+    }
+
+prod.addEventListener('change', () => {
+      const opt = prod.options[prod.selectedIndex];
+      price.value = opt?.dataset?.price || '';
+      calc();
+    });
+
+    price.addEventListener('input', calc);
+    qty.addEventListener('input', calc);
+
+    const allow = document.getElementById('allow_edit_final');
+    const finalBlock = document.getElementById('final_price_block');
+    const finalInput = document.getElementById('final_price');
+
+    if (allow && finalBlock && finalInput) {
+      allow.addEventListener('change', () => {
+        finalBlock.style.display = allow.checked ? 'block' : 'none';
+        // si lo desactivo, reseteo al subtotal actual
+        calc();
+      });
+
+      finalInput.addEventListener('input', () => {
+        // no recalculamos subtotal, solo dejamos el valor para enviar
+      });
+
+      // inicial
+      calc();
+    }
+
+</script>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

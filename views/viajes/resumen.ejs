@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head', { title: 'Viajes - Resumen' }) %>
+<body>
+  <%- include('../partials/nav') %>
+
+  <div class="container">
+    <h1>Viajes - Resumen</h1>
+
+    <div class="card">
+      <h2>Dashboard semanal</h2>
+      <p><b>Semana:</b> <%= weekStart %> al <%= weekEnd %></p>
+      <p><b>Ventas:</b> <%= dashboard.sales_count %></p>
+      <p><b>Cobrado:</b> Efectivo $<%= dashboard.saldo_cobrado_efectivo.toFixed(2) %> | Transferencia $<%= dashboard.saldo_cobrado_transferencia.toFixed(2) %></p>
+      <p><b>A cobrar (fiado/vales):</b> $<%= dashboard.saldo_a_cobrar.toFixed(2) %></p>
+      <p><b>Ventas con deuda:</b> <%= dashboard.ventas_con_deuda %></p>
+    </div>
+
+    <div class="card">
+      <h2>Elegir día</h2>
+      <div class="grid">
+        <% days.forEach(d => { %>
+          <a class="card card--link" href="/viajes/resumen/dia?date=<%= d.date %>"><%= d.label %></a>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="row">
+      <a class="btn" href="/viajes/vender">Vender</a>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

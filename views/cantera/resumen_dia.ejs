@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head', { title: 'Cantera - Día' }) %>
+<body>
+  <%- include('../partials/nav') %>
+
+  <div class="container">
+    <h1>Cantera - Día: <%= date %></h1>
+
+    <div class="card">
+      <h2>Resumen diario</h2>
+      <p><b>Ventas:</b> <%= summary.ventas %></p>
+      <p><b>Cobrado efectivo:</b> $<%= summary.efectivo.toFixed(2) %></p>
+      <p><b>Cobrado transferencia:</b> $<%= summary.transferencia.toFixed(2) %></p>
+      <p><b>A cobrar (fiado/vales):</b> $<%= summary.a_cobrar.toFixed(2) %></p>
+    </div>
+
+    <div class="card">
+      <h2>Filtro por cliente</h2>
+      <form method="GET" action="/cantera/resumen/dia" class="row">
+        <input type="hidden" name="date" value="<%= date %>"/>
+        <input type="hidden" name="weekStart" value="<%= back.weekStart || '' %>"/>
+        <input type="hidden" name="month" value="<%= back.month || '' %>"/>
+        <input type="hidden" name="year" value="<%= back.year || '' %>"/>
+
+        <select name="clientId">
+          <option value="">-- Todos --</option>
+          <% clients.forEach(c => { %>
+            <option value="<%= c.id %>" <%= String(clientId)===String(c.id) ? 'selected' : '' %>><%= c.full_name %></option>
+          <% }) %>
+        </select>
+        <button class="btn" type="submit">Filtrar</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Ventas</h2>
+
+      <% if (!sales.length) { %>
+        <p>No hay ventas.</p>
+      <% } %>
+
+      <% sales.forEach(s => { %>
+        <div class="sale">
+          <div class="sale__top">
+            <div>
+              <b><%= new Date(s.sale_datetime).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) %></b>
+              <span> | <%= s.client_name %></span>
+              <span class="muted"> | <%= s.product_name || '' %></span>
+            </div>
+            <span class="badge"><%= s.payment_method %></span>
+          </div>
+
+          <div class="sale__mid">
+            <span>Cant: <%= Number(s.qty || 1) %></span>
+            <span>Unit: $<%= Number(s.product_price || 0).toFixed(2) %></span>
+            <span>Total: $<%= Number(s.final_price).toFixed(2) %></span>
+            <span>Pagado: $<%= Number(s.paid_amount).toFixed(2) %></span>
+            <span>Deuda: $<%= Number(s.debt).toFixed(2) %></span>
+          </div>
+
+          <% if (s.debt > 0) { %>
+            <form method="POST" action="/cantera/pagos" class="row">
+              <input type="hidden" name="sale_id" value="<%= s.id %>"/>
+              <input type="hidden" name="redirect_date" value="<%= date %>"/>
+              <input type="hidden" name="redirect_clientId" value="<%= clientId %>"/>
+
+              <input type="hidden" name="redirect_weekStart" value="<%= back.weekStart || '' %>"/>
+              <input type="hidden" name="redirect_month" value="<%= back.month || '' %>"/>
+              <input type="hidden" name="redirect_year" value="<%= back.year || '' %>"/>
+
+              <select name="pay_method" required>
+                <option value="efectivo">Efectivo</option>
+                <option value="transferencia">Transferencia</option>
+              </select>
+
+              <select name="mode">
+                <option value="parcial">Parcial</option>
+                <option value="total">Total</option>
+              </select>
+
+              <input name="amount" type="number" step="0.01" placeholder="Monto parcial"/>
+              <button class="btn" type="submit">Registrar pago</button>
+            </form>
+            <small>Si elegís <b>Total</b>, paga exactamente la deuda.</small>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="row">
+      <a class="btn btn--ghost"
+         href="/cantera/semanal?year=<%= back.year || '' %>&month=<%= back.month || '' %>&weekStart=<%= back.weekStart || '' %>&clientId=<%= clientId || '' %>">
+        Volver a semana
+      </a>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

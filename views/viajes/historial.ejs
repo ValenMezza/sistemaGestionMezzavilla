@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head', { title: 'Viajes - Historial' }) %>
+<body>
+  <%- include('../partials/nav') %>
+
+  <div class="container">
+    <h1>Viajes - Historial</h1>
+    <p class="muted">Ventas de viajes ya realizadas (no incluye programados).</p>
+
+    <div class="card">
+      <h2>Filtros</h2>
+      <form method="GET" action="/viajes/historial" class="row">
+        <div style="min-width:180px;">
+          <label>Desde</label>
+          <input type="date" name="from" value="<%= from %>" onchange="this.form.submit()" />
+        </div>
+
+        <div style="min-width:180px;">
+          <label>Hasta</label>
+          <input type="date" name="to" value="<%= to %>" onchange="this.form.submit()" />
+        </div>
+
+        <div style="min-width:260px;">
+          <label>Cliente (opcional)</label>
+          <select name="clientId" onchange="this.form.submit()">
+            <option value="">-- Todos --</option>
+            <% clients.forEach(c => { %>
+              <option value="<%= c.id %>" <%= String(clientId)===String(c.id) ? 'selected' : '' %>><%= c.full_name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div style="min-width:260px;">
+          <label>Producto (opcional)</label>
+          <select name="productId" onchange="this.form.submit()">
+            <option value="">-- Todos --</option>
+            <% products.forEach(p => { %>
+              <option value="<%= p.id %>" <%= String(productId)===String(p.id) ? 'selected' : '' %>><%= p.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div style="min-width:220px;">
+          <label>Método de pago (opcional)</label>
+          <select name="paymentMethod" onchange="this.form.submit()">
+            <option value="">-- Todos --</option>
+            <option value="efectivo" <%= paymentMethod==='efectivo' ? 'selected' : '' %>>Efectivo</option>
+            <option value="transferencia" <%= paymentMethod==='transferencia' ? 'selected' : '' %>>Transferencia</option>
+            <option value="vales" <%= paymentMethod==='vales' ? 'selected' : '' %>>Vales</option>
+            <option value="fiado" <%= paymentMethod==='fiado' ? 'selected' : '' %>>Fiado</option>
+          </select>
+        </div>
+
+        <div style="min-width:170px; display:flex; align-items:end;">
+          <label style="display:flex; gap:8px; align-items:center; margin:0;">
+            <input type="checkbox" name="conDeuda" <%= (conDeuda==='on' || conDeuda==='true') ? 'checked' : '' %> onchange="this.form.submit()">
+            Con deuda
+          </label>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <div>
+          <h2>Resultados</h2>
+          <p class="muted"><b>Período:</b> <%= from %> al <%= to %></p>
+        </div>
+        <a class="btn btn--ghost" href="/viajes/programados">Ver programados</a>
+      </div>
+
+      <% if (!salesList.length) { %>
+        <p class="muted">No hay viajes vendidos para este período / filtros.</p>
+      <% } else { %>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Dirección</th>
+              <th>Chofer</th>
+              <th>Producto</th>
+              <th>Qty</th>
+              <th>Flete</th>
+              <th>Pago</th>
+              <th>Total</th>
+              <th>Deuda</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% salesList.forEach(s => { %>
+              <tr>
+                <td><%= s.dayISO %></td>
+                <td><%= s.time %></td>
+                <td><%= s.client_name %></td>
+                <td><%= s.address || '-' %></td>
+                <td><%= s.driver_name || '-' %></td>
+                <td><%= s.product_name %></td>
+                <td><%= s.qty %></td>
+                <td>$<%= Number(s.freight_price || 0).toFixed(2) %></td>
+                <td><%= s.payment_method %></td>
+                <td>$<%= Number(s.final_price).toFixed(2) %></td>
+                <td>$<%= Number(s.debt).toFixed(2) %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+
+    <a class="btn btn--ghost" href="/viajes">Volver</a>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('partials/head', { title: 'Login' }) %>
+<body>
+  <%- include('partials/nav') %>
+
+  <div class="auth-wrap">
+    <div class="card auth-card">
+      <h1>Ingresar</h1>
+      <p class="muted">Acceso al sistema</p>
+
+      <% if (error) { %>
+        <div class="error"><%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/login">
+        <div class="field">
+          <label>Usuario</label>
+          <input name="username" required>
+        </div>
+
+        <div class="field">
+          <label>Contraseña</label>
+          <input type="password" name="password" required>
+        </div>
+
+        <button class="btn btn--primary" type="submit">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

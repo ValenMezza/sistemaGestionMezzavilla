@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head', { title: 'Cantera - Mensual' }) %>
+<body>
+  <%- include('../partials/nav') %>
+
+  <div class="container">
+    <h1>Cantera - Resumen mensual</h1>
+
+    <div class="card">
+      <h2>Seleccionar mes y filtros (opcional)</h2>
+
+      <form method="GET" action="/cantera/mensual" class="row">
+        <input type="hidden" name="year" value="<%= year %>"/>
+
+        <div style="min-width:220px;">
+          <label>Mes</label>
+          <select name="month" onchange="this.form.submit()">
+            <% months.forEach(m => { %>
+              <option value="<%= m.value %>" <%= Number(month)===Number(m.value) ? 'selected' : '' %>><%= m.label %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div style="min-width:260px;">
+          <label>Cliente (opcional)</label>
+          <select name="clientId" onchange="this.form.submit()">
+            <option value="">-- Todos --</option>
+            <% clients.forEach(c => { %>
+              <option value="<%= c.id %>" <%= String(clientId)===String(c.id) ? 'selected' : '' %>><%= c.full_name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div style="min-width:260px;">
+          <label>Producto (opcional)</label>
+          <select name="productId" onchange="this.form.submit()">
+            <option value="">-- Todos --</option>
+            <% products.forEach(p => { %>
+              <option value="<%= p.id %>" <%= String(productId)===String(p.id) ? 'selected' : '' %>><%= p.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div style="min-width:220px;">
+          <label>Método de pago (opcional)</label>
+          <select name="paymentMethod" onchange="this.form.submit()">
+            <option value="">-- Todos --</option>
+            <option value="efectivo" <%= paymentMethod==='efectivo' ? 'selected' : '' %>>Efectivo</option>
+            <option value="transferencia" <%= paymentMethod==='transferencia' ? 'selected' : '' %>>Transferencia</option>
+            <option value="vales" <%= paymentMethod==='vales' ? 'selected' : '' %>>Vales</option>
+            <option value="fiado" <%= paymentMethod==='fiado' ? 'selected' : '' %>>Fiado</option>
+          </select>
+        </div>
+
+        <div style="min-width:170px; display:flex; align-items:end;">
+          <label style="display:flex; gap:8px; align-items:center; margin:0;">
+            <input type="checkbox" name="conDeuda" <%= (conDeuda==='on' || conDeuda==='true') ? 'checked' : '' %> onchange="this.form.submit()">
+            Con deuda
+          </label>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <div>
+          <h2>Resumen del mes</h2>
+          <p class="muted"><b>Período:</b> <%= from %> al <%= to %></p>
+        </div>
+        <a class="btn btn--ghost" href="/cantera/mensual/pdf?year=<%= year %>&month=<%= month %>&clientId=<%= clientId %>&productId=<%= productId %>&paymentMethod=<%= paymentMethod %>&conDeuda=<%= conDeuda %>">Exportar PDF (Mes)</a>
+      </div>
+
+      <p><b>Ventas:</b> <%= dashboard.sales_count %></p>
+      <p><b>Cobrado:</b> Efectivo $<%= dashboard.saldo_cobrado_efectivo.toFixed(2) %> | Transferencia $<%= dashboard.saldo_cobrado_transferencia.toFixed(2) %></p>
+      <p><b>A cobrar:</b> $<%= dashboard.saldo_a_cobrar.toFixed(2) %> (<%= dashboard.ventas_con_deuda %> ventas con deuda)</p>
+    </div>
+
+    <div class="card">
+      <h2>Detalle</h2>
+
+      <% if (!salesList.length) { %>
+        <p class="muted">No hay ventas para este período / filtros.</p>
+      <% } else { %>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Producto</th>
+              <th>Qty</th>
+              <th>Pago</th>
+              <th>Total</th>
+              <th>Deuda</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% salesList.forEach(s => { %>
+              <tr>
+                <td><%= s.dayISO %></td>
+                <td><%= s.time %></td>
+                <td><%= s.client_name %></td>
+                <td><%= s.product_name %></td>
+                <td><%= s.qty %></td>
+                <td><%= s.payment_method %></td>
+                <td>$<%= Number(s.final_price).toFixed(2) %></td>
+                <td>$<%= Number(s.debt).toFixed(2) %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+
+    <a class="btn btn--ghost" href="/cantera">Volver</a>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

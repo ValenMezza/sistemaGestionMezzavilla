@@ -1,0 +1,28 @@
+{
+  "name": "cantera-sin-bd",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon ./bin/www",
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "dayjs": "^1.11.19",
+    "debug": "~2.6.9",
+    "dotenv": "^17.2.3",
+    "ejs": "~3.1.10",
+    "express": "~4.19.2",
+    "express-session": "^1.18.0",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "pdfkit": "^0.17.2",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

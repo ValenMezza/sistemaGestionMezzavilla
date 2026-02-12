@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head', { title: 'Stock' }) %>
+<body>
+  <%- include('../partials/nav') %>
+
+  <div class="container">
+    <div class="row row--space">
+      <h1>Stock</h1>
+      <a class="btn" href="/stock/nuevo">Nuevo producto</a>
+    </div>
+
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Activo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% products.forEach(p => { %>
+            <tr>
+              <td><%= p.name %></td>
+              <td>$<%= Number(p.price).toFixed(2) %></td>
+              <td><%= Number(p.stock_qty).toFixed(2) %></td>
+              <td><%= p.active ? 'Sí' : 'No' %></td>
+              <td class="row">
+                <a class="btn btn--ghost" href="/stock/<%= p.id %>/editar">Editar</a>
+                <form method="POST" action="/stock/<%= p.id %>/eliminar" style="display:inline;">
+                  <button class="btn btn--danger" type="submit">Desactivar</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

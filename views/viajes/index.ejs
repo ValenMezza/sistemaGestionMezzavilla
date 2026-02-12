@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head', { title: 'Viajes' }) %>
+<body>
+  <%- include('../partials/nav') %>
+
+  <div class="container">
+    <h1>Viajes</h1>
+    <p class="muted">Ventas con envío y logística</p>
+
+    <div class="grid">
+      <a href="/viajes/vender" class="card card--link">
+        <h2>Nueva venta</h2>
+        <p class="muted">Registrar venta con flete</p>
+      </a>
+
+      <a href="/viajes/semanal" class="card card--link">
+        <h2>Resúmenes semanales</h2>
+        <p class="muted">Ventas por semana y día</p>
+      </a>
+
+      <a href="/viajes/historial" class="card card--link">
+        <h2>Historial</h2>
+        <p class="muted">Viajes vendidos (ya realizados)</p>
+      </a>
+
+      <a href="/viajes/programados" class="card card--link">
+        <h2>Programados</h2>
+        <p class="muted">Viajes vendidos con fecha futura</p>
+      </a>
+
+      <a href="/viajes/mensual" class="card card--link">
+        <h2>Resumen mensual</h2>
+        <p class="muted">Vista general del mes</p>
+      </a>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

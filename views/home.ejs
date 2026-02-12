@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('partials/head', { title: 'Home' }) %>
+<body>
+  <%- include('partials/nav') %>
+
+  <div class="container">
+    <h1>Panel principal</h1>
+    <p class="muted">Accedé a los módulos del sistema</p>
+
+    <div class="grid">
+      <a href="/cantera" class="card card--link">
+        <h2>Cantera</h2>
+        <p class="muted">Ventas rápidas y resúmenes</p>
+      </a>
+
+      <a href="/viajes" class="card card--link">
+        <h2>Viajes</h2>
+        <p class="muted">Ventas con envío y fletes</p>
+      </a>
+
+      <a href="/stock" class="card card--link">
+        <h2>Stock</h2>
+        <p class="muted">Gestión de productos</p>
+      </a>
+
+      <a href="/clientes" class="card card--link">
+        <h2>Clientes</h2>
+        <p class="muted">Alta y edición de clientes</p>
+      </a>
+
+<!-- BLOQUE INFERIOR DASHBOARD -->
+<div class="grid grid--bottom" style="margin-top:18px;">
+
+  <!-- CLIENTES CON DEUDA -->
+  <div class="card card--wide">
+    <h2>Clientes con deuda</h2>
+
+    <% if (!topDebts || !topDebts.length) { %>
+      <p class="muted">No hay deudas registradas.</p>
+    <% } else { %>
+      <% topDebts.forEach(c => { %>
+        <div class="row row--space">
+          <span><b><%= c.full_name %></b></span>
+          <span>$<%= Number(c.debt).toFixed(2) %></span>
+        </div>
+      <% }) %>
+
+      <div class="card__actions">
+        <a class="btn btn--ghost" href="/clientes?conDeuda=true">Ver clientes</a>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- ÚLTIMOS PAGOS -->
+  <div class="card card--wide">
+    <h2>Últimos pagos</h2>
+
+    <% if (!recentPayments || !recentPayments.length) { %>
+      <p class="muted">Aún no hay pagos registrados.</p>
+    <% } else { %>
+      <% recentPayments.forEach(p => { %>
+        <div class="row row--space">
+          <span>
+            <%= p.client_name %>
+            <span class="muted">(<%= p.sale_type %>)</span>
+          </span>
+          <span>$<%= Number(p.amount).toFixed(2) %></span>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+
+</div>
+
+</div>
+
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<%- include('../partials/head', { title: 'Viajes - Venta' }) %>
+<body>
+  <%- include('../partials/nav') %>
+
+  <div class="container">
+    <h1>Viajes - Venta</h1>
+
+    <% if (error) { %><p class="error"><%= error %></p><% } %>
+
+    <form method="POST" action="/viajes/vender" class="card">
+      <label>Fecha y hora (editable)</label>
+      <input type="datetime-local" name="sale_datetime" required />
+
+      <label class="inline">
+        <input type="checkbox" name="client_manual_enabled" id="client_manual_enabled" />
+        Cliente no existe (cargar manual)
+      </label>
+
+      <div id="client_select_block">
+        <label>Cliente (obligatorio)</label>
+        <select name="client_id" id="client_id">
+          <option value="">-- Elegir cliente --</option>
+          <% clients.forEach(c => { %>
+            <option value="<%= c.id %>"><%= c.full_name %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div id="client_manual_block" style="display:none;">
+        <label>Nombre cliente (manual) (obligatorio)</label>
+        <input name="client_name_manual" placeholder="Nombre completo"/>
+      </div>
+
+      <label>Teléfono</label>
+      <input name="phone" placeholder="351..." />
+
+      <label>Chofer encargado</label>
+      <input name="driver_name" placeholder="Chofer" />
+
+      <label>Dirección a enviar</label>
+      <input name="address" placeholder="Dirección" />
+
+      <label>Producto (obligatorio)</label>
+      <select name="product_id" id="product_id" required>
+        <option value="">-- Elegir producto --</option>
+        <% products.forEach(p => { %>
+          <option value="<%= p.id %>" data-price="<%= p.price %>"><%= p.name %> ($<%= p.price %>)</option>
+        <% }) %>
+      </select>
+
+      <label>Precio unitario</label>
+      <input name="product_price" id="product_price" type="number" step="0.01" />
+
+      <label>Cantidad (obligatorio)</label>
+      <input name="qty" id="qty" type="number" min="1" step="1" value="1" required />
+
+      <label>Precio del flete</label>
+      <input name="freight_price" id="freight_price" type="number" step="0.01" value="0" />
+
+      <div class="card" style="margin:12px 0; padding:12px;">
+        <div><b>Subtotal producto:</b> $<span id="subtotal">0.00</span></div>
+        <div><b>Total con flete:</b> $<span id="computed">0.00</span></div>
+      
+<div class="inline" style="margin-top:10px;">
+  <input type="checkbox" id="allow_edit_final" name="allow_edit_final">
+  <label for="allow_edit_final">Modificar precio final</label>
+</div>
+
+<div class="field" id="final_price_block" style="display:none;">
+  <label>Precio final</label>
+  <input type="number" step="0.01" name="final_price" id="final_price" placeholder="0.00">
+  <small class="muted">Si está activo, este valor reemplaza el subtotal (producto + flete).</small>
+</div>
+
+</div>
+
+      <label>Forma de pago</label>
+      <select name="payment_method" required>
+        <option value="efectivo">Efectivo</option>
+        <option value="transferencia">Transferencia</option>
+        <option value="vales">Vales</option>
+        <option value="fiado">Fiado</option>
+      </select>
+
+      <label class="inline">
+        <input type="checkbox" name="allow_edit_final" id="allow_edit_final" />
+        Modificar precio final
+      </label>
+
+      <label>Precio final</label>
+      <input name="final_price" id="final_price" type="number" step="0.01" disabled />
+
+      <div class="row">
+        <button class="btn" type="submit">Guardar</button>
+        <a class="btn btn--ghost" href="/viajes/semanal">Ir a semanal</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // cliente manual
+    const manual = document.getElementById('client_manual_enabled');
+    const selBlock = document.getElementById('client_select_block');
+    const manBlock = document.getElementById('client_manual_block');
+    const clientSelect = document.getElementById('client_id');
+
+    function toggleClient(){
+      const on = manual.checked;
+      selBlock.style.display = on ? 'none' : 'block';
+      manBlock.style.display = on ? 'block' : 'none';
+      if(on) clientSelect.value = '';
+    }
+    manual.addEventListener('change', toggleClient);
+    toggleClient();
+
+    // producto + cantidad + flete
+    const prodSel = document.getElementById('product_id');
+    const unitInput = document.getElementById('product_price');
+    const qtyInput = document.getElementById('qty');
+    const freightInput = document.getElementById('freight_price');
+
+    const subtotalEl = document.getElementById('subtotal');
+    const computedEl = document.getElementById('computed');
+
+    const allow = document.getElementById('allow_edit_final');
+    const finalInput = document.getElementById('final_price');
+
+    function compute(){
+      const unit = Number(unitInput.value || 0);
+      const qty = Math.max(1, Number(qtyInput.value || 1));
+      const freight = Number(freightInput.value || 0);
+
+      const sub = unit * qty;
+      const total = sub + freight;
+
+      subtotalEl.textContent = sub.toFixed(2);
+      computedEl.textContent = total.toFixed(2);
+
+      if(!allow.checked) finalInput.value = total ? String(total) : '';
+    }
+
+    prodSel.addEventListener('change', () => {
+      const opt = prodSel.options[prodSel.selectedIndex];
+      const p = opt?.dataset?.price ? Number(opt.dataset.price) : 0;
+      unitInput.value = p ? String(p) : '';
+      compute();
+    });
+
+    unitInput.addEventListener('input', compute);
+    qtyInput.addEventListener('input', compute);
+    freightInput.addEventListener('input', compute);
+
+    allow.addEventListener('change', () => {
+      const block = document.getElementById('final_price_block');
+      if (block) block.style.display = allow.checked ? 'block' : 'none';
+      finalInput.disabled = !allow.checked;
+      compute();
+    });
+
+    // inicial
+    const block = document.getElementById('final_price_block');
+    if (block) block.style.display = allow.checked ? 'block' : 'none';
+    finalInput.disabled = !allow.checked;
+    compute();
+</script>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>
